@@ -69,3 +69,7 @@ select a specific RQS-SVG shared library.
 ## Examples
 
 Python examples live under `examples/python/`.
+
+## Acknowledgments
+
+This repository is based on results obtained from a project, JPNP20017, commissioned by the New Energy and Industrial Technology Development Organization (NEDO).
