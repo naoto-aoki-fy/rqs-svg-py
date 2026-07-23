@@ -2,7 +2,6 @@
 
 import ctypes
 import os
-from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 _C_INT_P = ctypes.POINTER(ctypes.c_int)
@@ -11,38 +10,6 @@ _NULL_INT_P = ctypes.cast(None, _C_INT_P)
 
 class QcsError(RuntimeError):
     """Raised when the shared library cannot be loaded or initialized."""
-
-
-def _default_library_candidates() -> List[Path]:
-    here = Path(__file__).resolve()
-    return [
-        here.parent / "libqcs.so",
-        Path.cwd() / "libqcs.so",
-    ]
-
-
-def find_library_path() -> Path:
-    """Return the first usable libqcs.so path.
-
-    Set ``QCS_LIBRARY_PATH`` to override the default lookup locations.
-    """
-
-    override = os.environ.get("QCS_LIBRARY_PATH")
-    if override:
-        path = Path(override).expanduser()
-        if path.exists():
-            return path
-        raise QcsError(f"QCS_LIBRARY_PATH does not exist: {path}")
-
-    for candidate in _default_library_candidates():
-        if candidate.exists():
-            return candidate
-
-    searched = ", ".join(str(path) for path in _default_library_candidates())
-    raise QcsError(
-        "libqcs.so was not found. Build it from the rqs-svg repository or set "
-        f"QCS_LIBRARY_PATH. Searched: {searched}"
-    )
 
 
 def _int_array(
@@ -220,10 +187,15 @@ class Simulator:
         self,
         num_qubits: int,
         num_clbits: Optional[int] = None,
-        library_path: Optional[Union[str, os.PathLike]] = None,
     ):
-        lib_path = Path(library_path) if library_path else find_library_path()
-        self._lib = ctypes.CDLL(str(lib_path))
+        try:
+            self._lib = ctypes.CDLL("libqcs.so")
+        except OSError as exc:
+            raise QcsError(
+                "Failed to load libqcs.so. Ensure that its directory is available "
+                "to the dynamic linker, for example through LD_LIBRARY_PATH."
+            ) from exc
+
         _configure_library(self._lib)
         self._sim = self._lib.qcs_simulator_create()
         if not self._sim:
