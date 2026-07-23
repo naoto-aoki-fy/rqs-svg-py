@@ -25,10 +25,10 @@ The package depends on Qiskit for loading and executing `QuantumCircuit` inputs.
 ## Shared library
 
 Build `libqcs.so` from the separate RQS-SVG repository and make it discoverable
-before using these bindings. Please set:
+before using these bindings:
 
 ```sh
-export LD_LIBRARY_PATH="/path/to/libqcs.so:$LD_LIBRARY_PATH"
+source /path/to/rqs-svg/env.bash
 ```
 
 ## Running Qiskit circuits
