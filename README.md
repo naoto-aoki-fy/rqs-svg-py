@@ -8,7 +8,13 @@ module.
 
 ## Installation
 
-Install this package with `pip`:
+Install directly from GitHub with `pip`:
+
+```sh
+pip install git+https://github.com/naoto-aoki-fy/rqs-svg-py.git
+```
+
+Alternatively, after cloning this repository, install it:
 
 ```sh
 pip install .
