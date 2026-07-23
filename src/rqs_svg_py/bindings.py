@@ -47,6 +47,8 @@ def _configure_library(lib: ctypes.CDLL) -> None:
     lib.qcs_simulator_get_num_procs.restype = ctypes.c_int
     lib.qcs_simulator_get_num_qubits.argtypes = [sim]
     lib.qcs_simulator_get_num_qubits.restype = ctypes.c_int
+    lib.qcs_simulator_get_num_clbits.argtypes = [sim]
+    lib.qcs_simulator_get_num_clbits.restype = ctypes.c_int
     lib.qcs_simulator_get_clbits.argtypes = [sim, _C_INT_P]
     lib.qcs_simulator_get_clbits.restype = None
     lib.qcs_simulator_measure.argtypes = [sim, ctypes.c_int]
@@ -218,6 +220,10 @@ class Simulator:
     def num_qubits(self) -> int:
         return self._lib.qcs_simulator_get_num_qubits(self._sim)
 
+    @property
+    def num_clbits(self) -> int:
+        return self._lib.qcs_simulator_get_num_clbits(self._sim)
+
     def init(self) -> None:
         self._lib.qcs_simulator_init(self._sim)
 
@@ -290,12 +296,12 @@ class Simulator:
         self._lib.qcs_simulator_reset(self._sim, qubit)
 
     def clbits(self) -> List[int]:
-        buffer = (ctypes.c_int * self._num_clbits)()
+        buffer = (ctypes.c_int * self.num_clbits)()
         self._lib.qcs_simulator_get_clbits(self._sim, buffer)
         return list(buffer)
 
     def clbits_string(self) -> str:
-        buffer = ctypes.create_string_buffer(self._num_clbits + 1)
+        buffer = ctypes.create_string_buffer(self.num_clbits + 1)
         self._lib.qcs_simulator_get_clbits_string(self._sim, buffer)
         return buffer.value.decode("ascii")
 
