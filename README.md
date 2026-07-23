@@ -33,6 +33,20 @@ source /path/to/rqs-svg/env.bash
 
 ## Running Qiskit circuits
 
+### CLI
+
+Installing the package exposes the circuit-execution CLI as `rqs-svg`:
+
+```sh
+rqs-svg --shots 10 path/to/circuit.py
+```
+
+The input may be a Python file that defines a `QuantumCircuit` named `qc` or
+`circuit`, a QPY file, or an OpenQASM file. Use `--library /path/to/libqcs.so`
+to select a specific RQS-SVG shared library.
+
+### Python
+
 The primary interface accepts a Qiskit `QuantumCircuit` and executes it with the
 RQS-SVG simulator:
 
@@ -64,21 +78,7 @@ with Simulator(2) as sim:
     print(sim.clbits_string())
 ```
 
-## CLI
-
-Installing the package exposes the circuit-execution CLI as `rqs-svg`:
-
-```sh
-rqs-svg --shots 10 path/to/circuit.py
-```
-
-The input may be a Python file that defines a `QuantumCircuit` named `qc` or
-`circuit`, a QPY file, or an OpenQASM file. Use `--library /path/to/libqcs.so`
-to select a specific RQS-SVG shared library.
-
-## Examples
-
-Python examples live under `examples/`.
+Examples live under `examples/`.
 
 ## Acknowledgments
 
