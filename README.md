@@ -25,12 +25,10 @@ The package depends on Qiskit for loading and executing `QuantumCircuit` inputs.
 ## Shared library
 
 Build `libqcs.so` from the separate RQS-SVG repository and make it discoverable
-before using these bindings. Either place `libqcs.so` in the current working
-directory when running Python, place it next to the installed package, pass an
-explicit path to APIs that accept `library_path`, or set:
+before using these bindings. Please set:
 
 ```sh
-export QCS_LIBRARY_PATH=/path/to/libqcs.so
+export LD_LIBRARY_PATH="/path/to/libqcs.so:$LD_LIBRARY_PATH"
 ```
 
 ## Running Qiskit circuits
