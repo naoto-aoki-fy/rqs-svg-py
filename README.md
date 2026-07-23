@@ -68,7 +68,7 @@ select a specific RQS-SVG shared library.
 
 ## Examples
 
-Python examples live under `examples/python/`.
+Python examples live under `examples/`.
 
 ## Acknowledgments
 
