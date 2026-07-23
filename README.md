@@ -56,10 +56,10 @@ print(result.counts)
 
 ## CLI
 
-Installing the package exposes the circuit-execution CLI as `rqs-svg-qcs`:
+Installing the package exposes the circuit-execution CLI as `rqs-svg`:
 
 ```sh
-rqs-svg-qcs --shots 10 path/to/circuit.py
+rqs-svg --shots 10 path/to/circuit.py
 ```
 
 The input may be a Python file that defines a `QuantumCircuit` named `qc` or

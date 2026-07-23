@@ -21,7 +21,7 @@ dependencies = [
 Homepage = "https://github.com/naoto-aoki-fy/rqs-svg"
 
 [project.scripts]
-rqs-svg-qcs = "rqs_svg_py.runner:main"
+rqs-svg = "rqs_svg_py.runner:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
