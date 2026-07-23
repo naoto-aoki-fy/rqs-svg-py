@@ -5,7 +5,7 @@ This module includes Qiskit gate and input-file resolution and calls
 ``rqs_svg_py.bindings.Simulator`` without generating or compiling C code.
 
 ``libqcs.so`` is provided by the separate RQS-SVG repository and must be
-discoverable by the binding or supplied through ``library_path``.
+discoverable by the binding.
 """
 
 from __future__ import annotations
@@ -336,7 +336,6 @@ def iter_circuit_shots(
     qc: QuantumCircuit,
     shots: int = 1,
     *,
-    library_path: Optional[Union[str, PathLike[str]]] = None,
     max_while_iterations: int = 1_000_000,
 ) -> Iterator[ShotRunResult]:
     """Yield a result immediately after each shot of ``qc`` completes.
@@ -351,7 +350,7 @@ def iter_circuit_shots(
     """
     _validate_run_arguments(qc, shots, max_while_iterations)
 
-    with Simulator(qc.num_qubits, qc.num_clbits, library_path=library_path) as sim:
+    with Simulator(qc.num_qubits, qc.num_clbits) as sim:
         start_event = sim.event_create()
         stop_event = sim.event_create()
 
@@ -385,7 +384,6 @@ def run_circuit(
     qc: QuantumCircuit,
     shots: int = 1,
     *,
-    library_path: Optional[Union[str, PathLike[str]]] = None,
     max_while_iterations: int = 1_000_000,
 ) -> CircuitRunResult:
     """Run ``qc`` and aggregate results yielded by ``iter_circuit_shots``."""
@@ -396,7 +394,6 @@ def run_circuit(
     for shot_result in iter_circuit_shots(
         qc,
         shots=shots,
-        library_path=library_path,
         max_while_iterations=max_while_iterations,
     ):
         counts[shot_result.clbits] += 1
@@ -423,7 +420,6 @@ def main() -> int:
     for shot_result in iter_circuit_shots(
         load_circuit(args.circuit_file),
         shots=args.shots,
-        library_path=args.library,
         max_while_iterations=args.max_while_iterations,
     ):
         if shot_result.proc_num == 0:

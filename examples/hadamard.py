@@ -26,10 +26,6 @@ def main() -> int:
         default=1,
         help="Number of times to run and measure the Hadamard circuit.",
     )
-    parser.add_argument(
-        "--library",
-        help="Path to libqcs.so; defaults to QCS_LIBRARY_PATH or current directory",
-    )
     args = parser.parse_args()
 
     if args.num_qubits <= 0:
@@ -38,7 +34,7 @@ def main() -> int:
     if args.num_samples <= 0:
         parser.error("--num-samples must be greater than 0")
 
-    with Simulator(args.num_qubits, library_path=args.library) as sim:
+    with Simulator(args.num_qubits) as sim:
         event_start = sim.event_create()
         event_stop = sim.event_create()
 
