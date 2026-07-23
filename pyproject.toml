@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rqs-svg-py"
+version = "0.1.0"
+description = "Python ctypes bindings and Qiskit circuit runner for RQS-SVG"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [
+  { name = "RQS-SVG contributors" },
+]
+dependencies = [
+  "qiskit>=2.3.0,<2.4.0",
+  "qiskit_qasm3_import",
+]
+
+[project.urls]
+Homepage = "https://github.com/naoto-aoki-fy/rqs-svg"
+
+[project.scripts]
+rqs-svg-qcs = "rqs_svg_py.runner:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

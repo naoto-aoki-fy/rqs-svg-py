@@ -3,11 +3,8 @@
 
 import argparse
 import json
-from pathlib import Path
-import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "python"))
-from qcs_ctypes import Simulator  # noqa: E402
+from rqs_svg_py import Simulator
 
 
 def run_ghz_circuit(sim: Simulator, num_qubits: int) -> None:
@@ -30,7 +27,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--library",
-        help="Path to libqcs.so; defaults to QCS_LIBRARY_PATH or repo root",
+        help="Path to libqcs.so; defaults to QCS_LIBRARY_PATH or current directory",
     )
     args = parser.parse_args()
 

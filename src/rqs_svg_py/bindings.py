@@ -15,9 +15,7 @@ class QcsError(RuntimeError):
 
 def _default_library_candidates() -> List[Path]:
     here = Path(__file__).resolve()
-    repo_root = here.parent.parent
     return [
-        repo_root / "libqcs.so",
         here.parent / "libqcs.so",
         Path.cwd() / "libqcs.so",
     ]
@@ -42,7 +40,7 @@ def find_library_path() -> Path:
 
     searched = ", ".join(str(path) for path in _default_library_candidates())
     raise QcsError(
-        "libqcs.so was not found. Build it with `make sharedlibrary` or set "
+        "libqcs.so was not found. Build it from the rqs-svg repository or set "
         f"QCS_LIBRARY_PATH. Searched: {searched}"
     )
 

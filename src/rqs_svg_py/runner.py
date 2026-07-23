@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 """Execute Qiskit ``QuantumCircuit`` objects directly with RQS-SVG.
 
-This standalone module includes its own Qiskit gate and input-file resolution
-and calls ``qcs_ctypes.Simulator`` without generating or compiling C code.
+This module includes Qiskit gate and input-file resolution and calls
+``rqs_svg_py.bindings.Simulator`` without generating or compiling C code.
 
-``qcs_ctypes.py`` must be importable (for example, add the ``rqs-svg/python``
-directory to ``PYTHONPATH``), and ``libqcs.so`` must be discoverable by that
-module or supplied through ``library_path``.
+``libqcs.so`` is provided by the separate RQS-SVG repository and must be
+discoverable by the binding or supplied through ``library_path``.
 """
 
 from __future__ import annotations
-
-from qcs_ctypes import Simulator
 
 import argparse
 import json
@@ -37,6 +34,8 @@ from qiskit.circuit.annotated_operation import ControlModifier
 from qiskit.circuit.library.standard_gates import get_standard_gate_name_mapping
 from qiskit.circuit.library.standard_gates.u import CUGate, UGate
 from qiskit.circuit.controlflow import ForLoopOp, IfElseOp, WhileLoopOp
+
+from .bindings import Simulator
 
 
 STANDARD_GATE_TYPE_NAME_PAIRS = [
@@ -184,16 +183,6 @@ class ShotRunResult:
     clbits: str
     elapsed_time: float
     proc_num: int
-
-
-try:
-    from qcs_ctypes import Simulator
-except ImportError as exc:  # pragma: no cover - depends on external repository
-    raise ImportError(
-        "qcs_ctypes.py could not be imported. Add the rqs-svg/python directory "
-        "to PYTHONPATH, for example: "
-        "PYTHONPATH=/path/to/rqs-svg/python:$PYTHONPATH"
-    ) from exc
 
 
 def _condition_value(condition, qc: QuantumCircuit, sim: Simulator) -> bool:
@@ -423,7 +412,7 @@ def run_circuit(
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Execute a Qiskit circuit directly using rqs-svg qcs_ctypes"
+        description="Execute a Qiskit circuit directly using rqs-svg Python bindings"
     )
     parser.add_argument("circuit_file", help="Input Python, QPY, or QASM file")
     parser.add_argument("--shots", type=int, default=1)
