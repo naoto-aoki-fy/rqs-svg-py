@@ -73,6 +73,13 @@ def _configure_library(lib: ctypes.CDLL) -> None:
     _configure_status_function(
         lib.qcs_simulator_measure_to_clbit, [sim, _BIT_NUM, _BIT_NUM, _BIT_P]
     )
+    _configure_status_function(
+        lib.qcs_simulator_measure_many, [sim, _BIT_NUM_P, _BIT_NUM, _BIT_P]
+    )
+    _configure_status_function(
+        lib.qcs_simulator_measure_many_to_clbits,
+        [sim, _BIT_NUM_P, _BIT_NUM, _BIT_NUM_P, _BIT_NUM, _BIT_P],
+    )
     _configure_status_function(lib.qcs_simulator_read, [sim, _BIT_NUM, _BIT_P])
     _configure_status_function(
         lib.qcs_simulator_get_clbits_string, [sim, ctypes.c_char_p]
@@ -291,6 +298,38 @@ class Simulator:
             self._lib.qcs_simulator_measure(self._sim, qubit, ctypes.byref(result)),
         )
         return int(result.value)
+
+    def measure_many(self, qubits: Iterable[int]) -> List[int]:
+        """Measure distinct qubits and return correlated results in input order."""
+        qubit_keepalive, qubit_ptr, count = _int_array(list(qubits))
+        results = (_BIT * count)()
+        _check(
+            self._lib,
+            self._lib.qcs_simulator_measure_many(self._sim, qubit_ptr, count, results),
+        )
+        _ = qubit_keepalive
+        return [int(result) for result in results]
+
+    def measure_many_to_clbits(
+        self, qubits: Iterable[int], clbits: Iterable[int]
+    ) -> List[int]:
+        """Measure qubits and write correlated results to corresponding clbits."""
+        qubit_keepalive, qubit_ptr, qubit_count = _int_array(list(qubits))
+        clbit_keepalive, clbit_ptr, clbit_count = _int_array(list(clbits))
+        results = (_BIT * qubit_count)()
+        _check(
+            self._lib,
+            self._lib.qcs_simulator_measure_many_to_clbits(
+                self._sim,
+                qubit_ptr,
+                qubit_count,
+                clbit_ptr,
+                clbit_count,
+                results,
+            ),
+        )
+        _ = (qubit_keepalive, clbit_keepalive)
+        return [int(result) for result in results]
 
     def read(self, clbit: int) -> int:
         result = _BIT()

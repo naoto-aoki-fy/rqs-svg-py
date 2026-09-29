@@ -73,10 +73,14 @@ from rqs_svg_py import Simulator
 with Simulator(2) as sim:
     sim.h(0)
     sim.x(1, controls=[0])
-    sim.measure_to_clbit(0, 0)
-    sim.measure_to_clbit(1, 1)
+    results = sim.measure_many_to_clbits([0, 1], [0, 1])
+    print(results)
     print(sim.clbits_string())
 ```
+
+`measure_many` and `measure_many_to_clbits` preserve the input order and use
+RQS-SVG's correlated multi-qubit measurement interface. Qiskit circuits also
+batch adjacent measurements automatically.
 
 Examples live under `examples/`.
 

@@ -235,6 +235,17 @@ def _execute_instructions(
     *,
     max_while_iterations: int,
 ) -> None:
+    measurement_qubits: list[int] = []
+    measurement_clbits: list[int] = []
+
+    def flush_measurements() -> None:
+        if measurement_qubits:
+            sim.measure_many_to_clbits(
+                measurement_qubits.copy(), measurement_clbits.copy()
+            )
+            measurement_qubits.clear()
+            measurement_clbits.clear()
+
     for instruction in instructions:
         operation = instruction.operation
         qubits = tuple(qc.find_bit(bit).index for bit in instruction.qubits)
@@ -242,8 +253,13 @@ def _execute_instructions(
 
         if isinstance(operation, Measure):
             for qubit, clbit in zip(qubits, clbits):
-                sim.measure_to_clbit(qubit, clbit)
+                if qubit in measurement_qubits or clbit in measurement_clbits:
+                    flush_measurements()
+                measurement_qubits.append(qubit)
+                measurement_clbits.append(clbit)
             continue
+
+        flush_measurements()
 
         if isinstance(operation, Reset):
             for qubit in qubits:
@@ -310,6 +326,8 @@ def _execute_instructions(
             negative_controls,
             *parameters,
         )
+
+    flush_measurements()
 
 
 def _qiskit_bitstring(sim: Simulator, num_clbits: int) -> str:
