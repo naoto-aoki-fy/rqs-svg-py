@@ -62,6 +62,39 @@ result = run_circuit(qc, shots=10)
 print(result.counts)
 ```
 
+### Qiskit backend
+
+`RqsSvgBackend` exposes the simulator as a Qiskit `BackendV2`. Qiskit's
+transpiler compiles circuits to the backend's conservative `u`, `cx`,
+`measure`, and `reset` target, and execution returns a standard Qiskit job and
+result:
+
+```python
+from qiskit import QuantumCircuit, transpile
+from rqs_svg_py import RqsSvgBackend
+
+backend = RqsSvgBackend()
+qc = QuantumCircuit(2, 2)
+qc.h(0)
+qc.cx(0, 1)
+qc.measure([0, 1], [0, 1])
+
+compiled = transpile(qc, backend=backend)
+result = backend.run(compiled, shots=1000).result()
+print(result.get_counts())
+```
+
+The backend includes per-shot memory, so it can also be wrapped by Qiskit's
+`BackendSamplerV2`:
+
+```python
+from qiskit.primitives import BackendSamplerV2
+
+sampler = BackendSamplerV2(backend=backend)
+primitive_result = sampler.run([compiled], shots=1000).result()
+print(primitive_result[0].data.c.get_counts())
+```
+
 ## Python API
 
 For lower-level control, the package also provides a `Simulator` class that
