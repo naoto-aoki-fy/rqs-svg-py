@@ -7,7 +7,13 @@ from collections import Counter
 from collections.abc import Iterable
 
 from qiskit.circuit import QuantumCircuit
-from qiskit.circuit.library.standard_gates import get_standard_gate_name_mapping
+from qiskit.circuit.controlflow import ForLoopOp, IfElseOp, WhileLoopOp
+from qiskit.circuit.library.standard_gates import (
+    MCPhaseGate,
+    MCU1Gate,
+    MCXGate,
+    get_standard_gate_name_mapping,
+)
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
 from qiskit.transpiler import Target
@@ -41,7 +47,7 @@ class RqsSvgBackend(BackendV2):
 
     @property
     def target(self) -> Target:
-        """Return the conservative native instruction target."""
+        """Return the instructions directly supported by RQS-SVG."""
         return self._target
 
     @property
@@ -52,9 +58,26 @@ class RqsSvgBackend(BackendV2):
     @staticmethod
     def _build_target() -> Target:
         target = Target(description="RQS-SVG simulator target", num_qubits=None)
-        mapping = get_standard_gate_name_mapping()
-        for name in ("u", "cx", "measure", "reset"):
-            target.add_instruction(mapping[name], properties=None, name=name)
+
+        # The runner handles Qiskit's standard operations directly, so expose
+        # them as the simulator's native ISA. Delay is omitted because it has
+        # no corresponding runner implementation.
+        for name, instruction in get_standard_gate_name_mapping().items():
+            if name == "delay":
+                continue
+            target.add_instruction(instruction, properties=None, name=name)
+
+        # These operations have a variable width and must be registered by
+        # class rather than by a fixed-width instance.
+        target.add_instruction(MCXGate, name="mcx")
+        target.add_instruction(MCPhaseGate, name="mcphase")
+        target.add_instruction(MCU1Gate, name="mcu1")
+
+        # Control-flow operations are likewise interpreted directly by the
+        # runner and may contain blocks of different widths.
+        target.add_instruction(IfElseOp, name="if_else")
+        target.add_instruction(WhileLoopOp, name="while_loop")
+        target.add_instruction(ForLoopOp, name="for_loop")
         return target
 
     def run(self, run_input, **run_options) -> RqsSvgJob:

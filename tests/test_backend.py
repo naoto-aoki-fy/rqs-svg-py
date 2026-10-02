@@ -13,17 +13,31 @@ class RqsSvgBackendTests(unittest.TestCase):
     def setUp(self):
         self.backend = RqsSvgBackend()
 
-    def test_target_transpiles_to_conservative_basis(self):
-        circuit = QuantumCircuit(2, 2)
+    def test_transpile_level_zero_preserves_native_gates(self):
+        circuit = QuantumCircuit(3, 3)
         circuit.h(0)
+        circuit.rx(0.123, 1)
         circuit.cz(0, 1)
-        circuit.measure([0, 1], [0, 1])
+        circuit.ccx(0, 1, 2)
+        circuit.measure([0, 1, 2], [0, 1, 2])
 
-        compiled = transpile(circuit, self.backend)
+        compiled = transpile(circuit, self.backend, optimization_level=0)
 
-        self.assertLessEqual(
-            {instruction.operation.name for instruction in compiled.data},
-            {"u", "cx", "measure", "reset", "barrier"},
+        self.assertEqual(
+            [instruction.operation.name for instruction in compiled.data],
+            [instruction.operation.name for instruction in circuit.data],
+        )
+
+    def test_transpile_level_zero_preserves_variable_width_mcx(self):
+        circuit = QuantumCircuit(4, 1)
+        circuit.mcx([0, 1, 2], 3)
+        circuit.measure(3, 0)
+
+        compiled = transpile(circuit, self.backend, optimization_level=0)
+
+        self.assertEqual(
+            [instruction.operation.name for instruction in compiled.data],
+            ["mcx", "measure"],
         )
 
     @patch("rqs_svg_py.backend.iter_circuit_shots")

@@ -82,6 +82,17 @@ result = backend.run(qc, shots=1000).result()
 print(result.get_counts())
 ```
 
+Circuits do not need to be transpiled before execution because the backend
+handles Qiskit's standard gates directly. When integrating with code that does
+transpile circuits, use optimization level 0 to preserve those native gates:
+
+```python
+from qiskit import transpile
+
+compiled = transpile(qc, backend=backend, optimization_level=0)
+result = backend.run(compiled, shots=1000).result()
+```
+
 The backend includes per-shot memory, so it can also be wrapped by Qiskit's
 `BackendSamplerV2`:
 
